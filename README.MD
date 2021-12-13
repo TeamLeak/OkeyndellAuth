@@ -12,6 +12,6 @@
 
 ## Вопросы/Связь
 
-VK: https://vk.com/waifusgonewild
-Telegram: https://t.me/g_gebbels
-Discord: ★𝕬𝖓𝖆𝖗𝖈𝖍𝖞★𝔊𝔅ℭ#4459
+- VK: https://vk.com/waifusgonewild
+- Telegram: https://t.me/g_gebbels
+- Discord: ★𝕬𝖓𝖆𝖗𝖈𝖍𝖞★𝔊𝔅ℭ#4459
