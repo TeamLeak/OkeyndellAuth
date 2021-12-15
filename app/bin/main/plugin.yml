@@ -1,8 +1,0 @@
-name: Example
-author: Lion
-version: 0.0.1
-main: com.github.lkapitman.App
-commands:
-  example:
-      description: Hello World!
-      usage: /example
