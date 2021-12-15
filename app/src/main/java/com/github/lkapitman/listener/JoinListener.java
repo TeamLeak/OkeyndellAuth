@@ -1,5 +1,7 @@
 package com.github.lkapitman.listener;
 
+import com.github.lkapitman.utils.ColorAPI;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,9 +18,12 @@ public class JoinListener implements Listener {
         Location location = player.getLocation();
 
         hello += player.getName();
-        hello += "X: " + location.getX() + "\n Y: " + location.getY() + "\n Z: " + location.getZ();
+        hello += 
+        "\n X: " + location.getX() + 
+        "\n Y: " + location.getY() + 
+        "\n Z: " + location.getZ();
 
-        player.sendMessage(hello);
+        player.sendMessage(ColorAPI.process("<SOLID:FF0080> " + hello + " </SOLID:FF0080>"));
     }
 
 }
