@@ -14,10 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 
-// You can deserialize a JSON string with
-//
-//     Player data = UserDataConverter.fromJsonString(jsonString);
-public class UserDataConverter {
+public class AccountConverter {
     // Date-time helpers
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
@@ -31,7 +28,7 @@ public class UserDataConverter {
             .withZone(ZoneOffset.UTC);
 
     public static OffsetDateTime parseDateTimeString(String str) {
-        return ZonedDateTime.from(UserDataConverter.DATE_TIME_FORMATTER.parse(str)).toOffsetDateTime();
+        return ZonedDateTime.from(AccountConverter.DATE_TIME_FORMATTER.parse(str)).toOffsetDateTime();
     }
 
     private static final DateTimeFormatter TIME_FORMATTER = new DateTimeFormatterBuilder()
@@ -44,16 +41,16 @@ public class UserDataConverter {
             .withZone(ZoneOffset.UTC);
 
     public static OffsetTime parseTimeString(String str) {
-        return ZonedDateTime.from(UserDataConverter.TIME_FORMATTER.parse(str)).toOffsetDateTime().toOffsetTime();
+        return ZonedDateTime.from(AccountConverter.TIME_FORMATTER.parse(str)).toOffsetDateTime().toOffsetTime();
     }
     // Serialize/deserialize helpers
 
-    public static Player fromJsonString(File file) throws IOException {
+    public static Accounts fromJsonString(File file) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(file, Player.class);
+        return mapper.readValue(file, Accounts.class);
     }
 
-    public static void toJsonString(Player obj, File file) throws IOException {
+    public static void toJsonString(Accounts obj, File file) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(file, obj);
     }
@@ -70,12 +67,12 @@ public class UserDataConverter {
             @Override
             public OffsetDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
                 String value = jsonParser.getText();
-                return UserDataConverter.parseDateTimeString(value);
+                return AccountConverter.parseDateTimeString(value);
             }
         });
         mapper.registerModule(module);
-        reader = mapper.readerFor(Player.class);
-        writer = mapper.writerFor(Player.class);
+        reader = mapper.readerFor(Accounts.class);
+        writer = mapper.writerFor(Accounts.class);
     }
 
     private static ObjectReader getObjectReader() {

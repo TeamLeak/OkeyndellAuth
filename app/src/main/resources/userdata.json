@@ -1,6 +1,16 @@
 {
-    "username": "CarryLove",
-    "password": "123456",
-    "lastIP": "192.168.1.34",
-    "lastLogin": "28.12.2021"
+    "players": [
+        {
+            "username": "CarryLove",
+            "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+            "lastIP": "192.168.1.34",
+            "lastLogin": "28.12.2021"
+        },
+        {
+            "username": "okeyndell",
+            "password": "4d65b098fbb555adb67f17d111246f5c8eab5ff256d6412a52eb74933b8a7f10",
+            "lastIP": "192.168.1.34",
+            "lastLogin": "27.12.2021"
+        }
+    ]
 }

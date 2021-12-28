@@ -1,15 +1,15 @@
 package com.github.lkapitman.controller;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lkapitman.App;
+import com.github.lkapitman.commands.LoginCommand;
+import com.github.lkapitman.json.userdata.AccountConverter;
+import com.github.lkapitman.json.userdata.Accounts;
 import com.github.lkapitman.json.userdata.Player;
-import com.github.lkapitman.json.userdata.UserDataConverter;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -23,14 +23,27 @@ public class PlayerController implements Listener {
     }
 
     private boolean isRegistered = false;
+    private boolean sessionExpired = false;
+    private String playerPassword;
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         try {
-            Player player = UserDataConverter.fromJsonString(new File(instance.getDataFolder().getAbsolutePath() + "/userdata.json"));
-            event.getPlayer().sendMessage(player.getUsername() + " \n" + player.getPassword() + " \n" + player.getLastIP());
+            for (Player player : AccountConverter.fromJsonString(new File(instance.getDataFolder(), "/userdata.json")).getPlayers()) {
+                if (player.getUsername().equalsIgnoreCase(event.getPlayer().getName())) {
+                    isRegistered = true;
+                    if (!player.getLastIP().equalsIgnoreCase(event.getPlayer().getAddress().getHostString())) {
+                        event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Введите пароль! \n /login <пароль>!");
+                        LoginCommand.playerController = this;
+                        sessionExpired = true;
+                        playerPassword = player.getPassword();
+                        return;
+                    }
+                    return;
+                }
+            }
+            event.getPlayer().sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "У вас нет аккаунта! Зарегестрируйтесь \n /register <пароль> <пароль>");
         } catch (IOException e) {
-            event.getPlayer().sendMessage("Случилось что то страшное! \n LOG: \n" + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -39,4 +52,11 @@ public class PlayerController implements Listener {
         return isRegistered;
     }
 
+    public boolean isSessionExpired() {
+        return sessionExpired;
+    }
+
+    public String getPlayerPassword() {
+        return playerPassword;
+    }
 }
