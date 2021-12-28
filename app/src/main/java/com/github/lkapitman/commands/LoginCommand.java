@@ -62,6 +62,7 @@ public class LoginCommand implements CommandExecutor {
             }
         }
         sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Приятной игры!");
+        PlayerController.isLogin = true;
         return true;
     }
     

@@ -4,5 +4,6 @@ version: 0.0.1
 main: com.github.lkapitman.App
 commands:
   login:
-    usage: /login <password>
     description: Команда аутентификации.
+  register:
+    description: Команда регистрации аккаунта.

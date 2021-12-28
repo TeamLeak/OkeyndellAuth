@@ -3,6 +3,7 @@ package com.github.lkapitman;
 import java.io.IOException;
 
 import com.github.lkapitman.commands.LoginCommand;
+import com.github.lkapitman.commands.RegisterCommand;
 import com.github.lkapitman.config.Settings;
 import com.github.lkapitman.controller.PlayerController;
 
@@ -31,6 +32,7 @@ public class App extends JavaPlugin {
             isDedicatedLogs = settings.getPluginSettings().getDedicatedLogs();
 
         this.getCommand("login").setExecutor(new LoginCommand(this));
+        this.getCommand("register").setExecutor(new RegisterCommand(this));
         getServer().getPluginManager().registerEvents(new PlayerController(this), this);        
     }
 

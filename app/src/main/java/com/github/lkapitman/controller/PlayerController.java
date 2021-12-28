@@ -5,14 +5,18 @@ import java.io.IOException;
 
 import com.github.lkapitman.App;
 import com.github.lkapitman.commands.LoginCommand;
+import com.github.lkapitman.commands.RegisterCommand;
 import com.github.lkapitman.json.userdata.AccountConverter;
-import com.github.lkapitman.json.userdata.Accounts;
 import com.github.lkapitman.json.userdata.Player;
 
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 public class PlayerController implements Listener {
     
@@ -25,8 +29,10 @@ public class PlayerController implements Listener {
     private boolean isRegistered = false;
     private boolean sessionExpired = false;
     private String playerPassword;
+    
+    public static boolean isLogin = false;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
         try {
             for (Player player : AccountConverter.fromJsonString(new File(instance.getDataFolder(), "/userdata.json")).getPlayers()) {
@@ -43,6 +49,7 @@ public class PlayerController implements Listener {
                 }
             }
             event.getPlayer().sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "У вас нет аккаунта! Зарегестрируйтесь \n /register <пароль> <пароль>");
+            RegisterCommand.playerController = this;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,5 +65,30 @@ public class PlayerController implements Listener {
 
     public String getPlayerPassword() {
         return playerPassword;
+    }
+
+    public boolean isLogin() {
+        return isLogin;
+    }
+
+    public void onChat(AsyncPlayerChatEvent event) {
+        if (!isLogin) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Введите пароль! \n /login <пароль>!");
+        }
+    }
+
+    public void onInteract(PlayerInteractEvent event) {
+        if (!isLogin) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Введите пароль! \n /login <пароль>!");
+        }
+    }
+
+    public void onMove(PlayerMoveEvent event) {
+        if (!isLogin) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Введите пароль! \n /login <пароль>!");
+        }
     }
 }
