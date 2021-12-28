@@ -1,16 +1,16 @@
-# TutorialPlugin
+# OkeyndellAuth
 
-## Что это такое?
-Это репозиторий всех видео-уроков на тему: "Разработка плагинов minecraft 1.17"
+## What it is?
+This is the repository for my Spigot plugin. This plugin is light authentication to your server. I'm promoting it as a replacement for AuthMe
 
-## Как использовать?
-Клонируйте или скачайте репозиторий, затем проверьте у себя наличие:
+## How to use?
+Clone or download the repository, then check with yourself for:
 - Gradle 7.3+
-- Java 17+
-
-Если всё есть, пишем ./gradlew build, копируем собранный джарник в plugins/ вашего сервера и тестируем.
-
-## Вопросы/Связь
+- Java 16+
+- 
+If everything is there, write ./gradlew clean shadowJar, copy the assembled jar file to plugins / of your server and test it.
+Also, you can download from Releases
+## Questions / Contact
 
 - VK: https://vk.com/waifusgonewild
 - Telegram: https://t.me/g_gebbels
