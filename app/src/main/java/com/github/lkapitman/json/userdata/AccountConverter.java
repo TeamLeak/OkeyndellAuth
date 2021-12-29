@@ -3,9 +3,6 @@ package com.github.lkapitman.json.userdata;
 import java.io.File;
 import java.io.IOException;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
@@ -55,34 +52,5 @@ public class AccountConverter {
         mapper.writeValue(file, obj);
     }
 
-    private static ObjectReader reader;
-    private static ObjectWriter writer;
-
-    private static void instantiateMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(OffsetDateTime.class, new JsonDeserializer<OffsetDateTime>() {
-            @Override
-            public OffsetDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-                String value = jsonParser.getText();
-                return AccountConverter.parseDateTimeString(value);
-            }
-        });
-        mapper.registerModule(module);
-        reader = mapper.readerFor(Accounts.class);
-        writer = mapper.writerFor(Accounts.class);
-    }
-
-    private static ObjectReader getObjectReader() {
-        if (reader == null) instantiateMapper();
-        return reader;
-    }
-
-    private static ObjectWriter getObjectWriter() {
-        if (writer == null) instantiateMapper();
-        return writer;
-    }
 }
 

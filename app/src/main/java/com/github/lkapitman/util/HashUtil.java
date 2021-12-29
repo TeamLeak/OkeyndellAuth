@@ -11,4 +11,10 @@ public class HashUtil {
     public static String hashMD5(String s) {
         return DigestUtils.md5Hex(s);
     }
+
+    public static boolean isSame(String s, String s2) {
+        if (s.equalsIgnoreCase(s2))
+            return true;
+        return false;
+    }
 }

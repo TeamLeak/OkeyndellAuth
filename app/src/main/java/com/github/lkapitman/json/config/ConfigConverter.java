@@ -3,9 +3,6 @@ package com.github.lkapitman.json.config;
 import java.io.File;
 import java.io.IOException;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
@@ -14,9 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 
-// You can deserialize a JSON string with
-//
-// Player data = ConfigConverter.fromJsonString(jsonString);
 public class ConfigConverter {
     // Date-time helpers
 
@@ -56,36 +50,6 @@ public class ConfigConverter {
     public static void toJsonString(Player obj, File file) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(file, obj);
-    }
-
-    private static ObjectReader reader;
-    private static ObjectWriter writer;
-
-    private static void instantiateMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(OffsetDateTime.class, new JsonDeserializer<OffsetDateTime>() {
-            @Override
-            public OffsetDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-                String value = jsonParser.getText();
-                return ConfigConverter.parseDateTimeString(value);
-            }
-        });
-        mapper.registerModule(module);
-        reader = mapper.readerFor(Player.class);
-        writer = mapper.writerFor(Player.class);
-    }
-
-    private static ObjectReader getObjectReader() {
-        if (reader == null) instantiateMapper();
-        return reader;
-    }
-
-    private static ObjectWriter getObjectWriter() {
-        if (writer == null) instantiateMapper();
-        return writer;
     }
 }
 
