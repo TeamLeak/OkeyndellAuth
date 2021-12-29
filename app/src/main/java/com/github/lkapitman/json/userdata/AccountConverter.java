@@ -49,7 +49,7 @@ public class AccountConverter {
 
     public static void toJsonString(Accounts obj, File file) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(file, obj);
+        mapper.writerWithDefaultPrettyPrinter().writeValue(file, obj);
     }
 
 }

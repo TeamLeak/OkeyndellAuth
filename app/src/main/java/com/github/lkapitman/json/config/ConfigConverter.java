@@ -49,7 +49,7 @@ public class ConfigConverter {
 
     public static void toJsonString(Player obj, File file) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(file, obj);
+        mapper.writerWithDefaultPrettyPrinter().writeValue(file, obj);
     }
 }
 
