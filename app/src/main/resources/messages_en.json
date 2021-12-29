@@ -1,0 +1,18 @@
+{
+    "registerMessages": {
+        "registerUsage": "Usage: /register <password> <password>",
+        "passwordNoEquals": "Passwords don't match! \n /register <password> <password>",
+        "haveAccount": "You have an account! \n If you want to change your password -> /changepassword",
+        "registerError1": "We failed to register you! ",
+        "registerError2": "\n Something went wrong..."
+    },
+    "loginMessages": {
+        "loginUsage": "Correct usage: \n/login <password>",
+        "noAccount": "You don't have an account! Register \n /register <password> <password>",
+        "attempsError": "You have exhausted the number of attempts!",
+        "passwordNoEqual": "Wrong password! \n Try again-once!"
+    },
+    "inputPassword": "Enter your password! \n/login <password>!",
+    "entryMessage": "Have a nice game!"
+    
+}

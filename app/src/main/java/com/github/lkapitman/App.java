@@ -2,17 +2,19 @@ package com.github.lkapitman;
 
 import java.io.IOException;
 
+import com.github.lkapitman.config.MessagesList;
 import com.github.lkapitman.config.Settings;
 import com.github.lkapitman.controller.PlayerController;
 
-import com.github.lkapitman.util.ExtractFiles;
+import com.github.lkapitman.util.FileManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class App extends JavaPlugin {
 
-    private final ExtractFiles extractFiles = new ExtractFiles(this);    
+    private final FileManager extractFiles = new FileManager(this);    
     private final Settings settings = new Settings(this);
-
+    private final MessagesList messages = new MessagesList(this);
+    
     private boolean isDedicatedLogs;
 
     @Override
@@ -20,6 +22,7 @@ public class App extends JavaPlugin {
         extractFiles.extract(); 
         try {
             settings.init();
+            messages.init();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,4 +45,7 @@ public class App extends JavaPlugin {
         return settings;
     }
 
+    public MessagesList getMessages() {
+        return messages;
+    }
 }

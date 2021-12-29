@@ -1,7 +1,8 @@
 {
     "plugin": {
         "enabled": true,
-        "dedicatedLogs": false
+        "dedicatedLogs": false,
+        "language": "en"
     },
     "encryption": {
         "useEncrypt": true,
@@ -16,7 +17,8 @@
     },
     "Documentation": {
         "encryption": "You can use: SHA256; MD5; also you can disable it.",
-        "database": "You can use mySQL and SQLite; If you are using SQLite, you do not need to provide information.",
-        "logs": "This allows for plugin-specific logging."
+        "database": "You can use mySQL and SQLite; If you are using SQLite, you do not need to provide information. (Don't working)",
+        "logs": "This allows for plugin-specific logging.",
+        "language": "You can choose -> ru (Russian); en (English)"
     }
 }

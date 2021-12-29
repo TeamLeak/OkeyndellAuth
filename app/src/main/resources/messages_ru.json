@@ -1,0 +1,18 @@
+{
+    "registerMessages": {
+        "registerUsage": "Использование: /register <password> <password>",
+        "passwordNoEquals": "Пароли не совпадают! \n /register <password> <password>",
+        "haveAccount": "У вас есть аккаунт! \n Если вы хотите поменять пароль -> /changepassword",
+        "registerError1": "Нам не удалось вас зарегестрировать!",
+        "registerError2": "\n Что то пошло не так..."
+    },
+    "loginMessages": {
+        "loginUsage": "Правильное использование: \n /login <пароль>",
+        "noAccount": "У вас нет аккаунта! Зарегестрируйтесь \n /register <пароль> <пароль>",
+        "attempsError": "Вы исчерпали кол-во попыток!",
+        "passwordNoEqual": "Неправильный пароль! \n Попробуйте ещё-раз!"
+    },
+    "inputPassword": "Введите пароль! \n /login <пароль>!",
+    "entryMessage": "Приятной игры!"
+    
+}

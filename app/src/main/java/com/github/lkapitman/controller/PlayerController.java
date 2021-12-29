@@ -19,8 +19,9 @@ import com.github.lkapitman.controller.PlayerController;
 import com.github.lkapitman.json.SetAccountUtil;
 import com.github.lkapitman.util.DateUtil;
 import com.github.lkapitman.util.HashUtil;
+import com.github.lkapitman.util.PrintUtil;
 
-public class PlayerController implements Listener, CommandExecutor{
+public class PlayerController implements Listener, CommandExecutor {
     
     private final App instance;
 
@@ -39,10 +40,9 @@ public class PlayerController implements Listener, CommandExecutor{
         try {
             for (Player player : AccountConverter.fromJsonString(new File(instance.getDataFolder(), "/userdata.json")).getPlayers()) {
                 if (player.getUsername().equalsIgnoreCase(event.getPlayer().getDisplayName())) {
-                    event.getPlayer().sendMessage(event.getPlayer().getName());
                     isRegistered = true;
                     if (!player.getLastIP().equalsIgnoreCase(event.getPlayer().getAddress().getHostString())) {
-                        event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Введите пароль! \n /login <пароль>!");
+                        PrintUtil.printMSG(instance, event.getPlayer(), ChatColor.RED + "" + ChatColor.BOLD + instance.getMessages().getInputPassword());
                         isSessionExpired = true;
                         playerPassword = player.getPassword();
                         return;
@@ -50,7 +50,7 @@ public class PlayerController implements Listener, CommandExecutor{
                     return;
                 }
             }
-            event.getPlayer().sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "У вас нет аккаунта! Зарегестрируйтесь \n /register <пароль> <пароль>");
+            PrintUtil.printMSG(instance, event.getPlayer(), ChatColor.GOLD + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,17 +64,17 @@ public class PlayerController implements Listener, CommandExecutor{
             if (!(sender instanceof org.bukkit.entity.Player))
                 return false;
             if (args.length <= 1) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Использование: /register <password> <password>");
+                PrintUtil.printMSG(instance, player, ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getRegisterUsage());
                 return false;
             }
             
             if (!args[0].equalsIgnoreCase(args[1])) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Пароли не совпадают! \n /register <password> <password>");
+                PrintUtil.printMSG(instance, player, ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getPasswordNoEquals());
                 return false;
             }
 
             if (isRegistered) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "У вас есть аккаунт! \n Если вы хотите поменять пароль -> /changepassword");
+                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "" + instance.getMessages().getRegisterMessages().getHaveAccount());
                 return false;
             }
 
@@ -97,11 +97,11 @@ public class PlayerController implements Listener, CommandExecutor{
             try {
                 SetAccountUtil.addToAccounts(new File(instance.getDataFolder(), "/userdata.json"), username, password, lastIP, lastLogin);
             } catch (IOException e) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Нам не удалось вас зарегестрировать!" + ChatColor.RED + "" + ChatColor.ITALIC + " \n Что то пошло не так...");
+                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getRegisterError1() + ChatColor.RED + "" + ChatColor.ITALIC + instance.getMessages().getRegisterMessages().getRegisterError2());
                 e.printStackTrace();
                 return false;
             }
-            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Приятной игры!");
+            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getEntryMessage());
             isRegistered = true;
             isSessionExpired = false;
             return true;
@@ -109,17 +109,17 @@ public class PlayerController implements Listener, CommandExecutor{
 
         if (command.getName().equalsIgnoreCase("login")) {
             if (args.length < 1) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "У вас нет аккаунта! \n /login <пароль>");
+                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getLoginUsage());
                 return false;
             }
             if (!isRegistered) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "У вас нет аккаунта! \n /register <пароль> <пароль>");
+                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
                 return false;
             }
             if (isSessionExpired) {
     
                 if (tryCount == 5) {
-                    player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + "Вы исчерпали кол-во попыток!");
+                    player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getAttempsError());
                     tryCount = 0;
                     return false;
                 }
@@ -127,27 +127,27 @@ public class PlayerController implements Listener, CommandExecutor{
                 if (instance.getSettings().getEncryptionSettings().getUseEncrypt()) {
                     if (instance.getSettings().getEncryptionSettings().getEncryptType().equalsIgnoreCase("SHA256")) {
                         if (!HashUtil.isSame(HashUtil.hashSHA256(args[0]), playerPassword)) {
-                            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Неправильный пароль! \n Попробуйте ещё-раз!");
+                            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
                             tryCount = tryCount + 1;
                             return false;
                         }
                     }
                     if (instance.getSettings().getEncryptionSettings().getEncryptType().equalsIgnoreCase("MD5")) {
                         if (!HashUtil.isSame(HashUtil.hashMD5(args[0]), playerPassword)) {
-                            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Неправильный пароль! \n Попробуйте ещё-раз!");
+                            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
                             tryCount = tryCount + 1;
                             return false;
                         }
                     }
                 } else {
                     if (!HashUtil.isSame(args[0], playerPassword)) {
-                        sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Неправильный пароль! \n Попробуйте ещё-раз!");
+                        sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
                         tryCount = tryCount + 1;
                         return false;
                     }
                 }
             }
-            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Приятной игры!");
+            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getEntryMessage());
             isRegistered = true;
             isSessionExpired = false;
             try {
