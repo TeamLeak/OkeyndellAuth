@@ -46,11 +46,14 @@ public class PlayerController implements Listener, CommandExecutor {
         if (instance.getAccountManager().isRegistered(player.getName())) {
             if (instance.getAccountManager().isSessionExpired(player.getName(), player.getAddress().getHostString())) {
                 players.add(player);
+                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getInputPassword());
             } else {
                 player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getEntryMessage());
             }
         } else {
             neededRegistered.add(player);
+            players.add(player);
+            player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
         }
     }
 
@@ -64,9 +67,10 @@ public class PlayerController implements Listener, CommandExecutor {
         if (command.getName().equalsIgnoreCase("register")) {
             instance.getLTool().log(player.getName() + " trying register!");
 
-            if (!instance.getAccountManager().isSame(player.getName(), neededRegistered) || ! instance.getAccountManager().isRegistered(player.getName()))
+            if (!instance.getAccountManager().isSame(player.getName(), neededRegistered)) {
+                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getHaveAccount());
                 return false;
-            
+            }
             if (!(sender instanceof org.bukkit.entity.Player))
                 return false;
 
@@ -103,15 +107,12 @@ public class PlayerController implements Listener, CommandExecutor {
 
         if (command.getName().equalsIgnoreCase("login")) {
             
-            if (!instance.getAccountManager().isSame(player.getName(), players))
-                return false;
-            
-            instance.getLTool().log(player.getName() + " trying login!");
-
-            if (!instance.getAccountManager().isRegistered(player.getName())) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
+            if (!instance.getAccountManager().isSame(player.getName(), players)) {
+                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
                 return false;
             }
+
+            instance.getLTool().log(player.getName() + " trying login!");
 
             if (args.length < 1) {
                 sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getLoginUsage());
@@ -133,6 +134,12 @@ public class PlayerController implements Listener, CommandExecutor {
                     } else {
                         sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
                     }
+                } else {
+                    if (args[0].equals(instance.getAccountManager().getPassword(player.getName()))) {
+                        timer.cancel();
+                    } else {
+                        sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
+                    }
                 }
             }
 
@@ -141,7 +148,7 @@ public class PlayerController implements Listener, CommandExecutor {
             neededRegistered.remove(player);
             players.remove(player);
 
-            instance.getLTool().log(player.getName() + " succesfull register!");
+            instance.getLTool().log(player.getName() + " succesfull login!");
 
             try {
                 instance.getAccountManager().addLoginInfo(new File(instance.getDataFolder(), "/userdata.json"), player.getName(), player.getAddress().getHostString(), DateUtil.getDate());
