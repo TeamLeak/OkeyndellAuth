@@ -2,24 +2,29 @@ package com.github.lkapitman.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.github.lkapitman.App;
-import com.github.lkapitman.json.userdata.AccountConverter;
-import com.github.lkapitman.json.userdata.Player;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+
 import com.github.lkapitman.controller.PlayerController;
-import com.github.lkapitman.json.SetAccountUtil;
 import com.github.lkapitman.util.DateUtil;
-import com.github.lkapitman.util.HashUtil;
-import com.github.lkapitman.util.PrintUtil;
+
 
 public class PlayerController implements Listener, CommandExecutor {
     
@@ -29,30 +34,23 @@ public class PlayerController implements Listener, CommandExecutor {
         this.instance = instance;
     }
     
-    private static boolean isRegistered = false;
-    private static boolean isSessionExpired = false;
-    private static String playerPassword;
-    private static int tryCount = 0;
-
+    private static HashSet<org.bukkit.entity.Player> players = new HashSet<>();
+    private static HashSet<org.bukkit.entity.Player> neededRegistered = new HashSet<>();
+    
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
+        org.bukkit.entity.Player player = event.getPlayer();
 
-        try {
-            for (Player player : AccountConverter.fromJsonString(new File(instance.getDataFolder(), "/userdata.json")).getPlayers()) {
-                if (player.getUsername().equalsIgnoreCase(event.getPlayer().getDisplayName())) {
-                    isRegistered = true;
-                    if (!player.getLastIP().equalsIgnoreCase(event.getPlayer().getAddress().getHostString())) {
-                        PrintUtil.printMSG(instance, event.getPlayer(), ChatColor.RED + "" + ChatColor.BOLD + instance.getMessages().getInputPassword());
-                        isSessionExpired = true;
-                        playerPassword = player.getPassword();
-                        return;
-                    }
-                    return;
-                }
+        instance.getLTool().log(player.getName() + " joined!");
+
+        if (instance.getAccountManager().isRegistered(player.getName())) {
+            if (instance.getAccountManager().isSessionExpired(player.getName(), player.getAddress().getHostString())) {
+                players.add(player);
+            } else {
+                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getEntryMessage());
             }
-            PrintUtil.printMSG(instance, event.getPlayer(), ChatColor.GOLD + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            neededRegistered.add(player);
         }
     }
 
@@ -60,103 +58,128 @@ public class PlayerController implements Listener, CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         org.bukkit.entity.Player player = (org.bukkit.entity.Player) sender;
 
+        if (!instance.getAccountManager().isSame(player.getName(), players))
+            return false;
+
         if (command.getName().equalsIgnoreCase("register")) {
+            instance.getLTool().log(player.getName() + " trying register!");
+
+            if (!instance.getAccountManager().isSame(player.getName(), neededRegistered) || ! instance.getAccountManager().isRegistered(player.getName()))
+                return false;
+            
             if (!(sender instanceof org.bukkit.entity.Player))
                 return false;
+
             if (args.length <= 1) {
-                PrintUtil.printMSG(instance, player, ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getRegisterUsage());
+                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getRegisterUsage());
                 return false;
             }
             
-            if (!args[0].equalsIgnoreCase(args[1])) {
-                PrintUtil.printMSG(instance, player, ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getPasswordNoEquals());
+            if (!args[0].equals(args[1])) {
+                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getPasswordNoEquals());
                 return false;
             }
 
-            if (isRegistered) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "" + instance.getMessages().getRegisterMessages().getHaveAccount());
-                return false;
-            }
-
-            String username = player.getName();
-            String lastIP = player.getAddress().getHostString();
-            String lastLogin = DateUtil.getDate();
             String password = "";
 
             if (instance.getSettings().getEncryptionSettings().getUseEncrypt()) {
-                if (instance.getSettings().getEncryptionSettings().getEncryptType().equalsIgnoreCase("SHA256")) {
-                    password = HashUtil.hashSHA256(args[0]);
-                }
-                if (instance.getSettings().getEncryptionSettings().getEncryptType().equalsIgnoreCase("MD5")) {
-                    password = HashUtil.hashMD5(args[0]);
-                }
-            } else {
-                password = args[0];
+                password = instance.getHashManager().hash(args[0]);
             }
 
             try {
-                SetAccountUtil.addToAccounts(new File(instance.getDataFolder(), "/userdata.json"), username, password, lastIP, lastLogin);
+                instance.getAccountManager().addToAccounts(instance.getUserdataFile(), player.getName(), password, player.getAddress().getHostString(), DateUtil.getDate());
             } catch (IOException e) {
                 sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getRegisterError1() + ChatColor.RED + "" + ChatColor.ITALIC + instance.getMessages().getRegisterMessages().getRegisterError2());
-                e.printStackTrace();
                 return false;
             }
+            
             sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getEntryMessage());
-            isRegistered = true;
-            isSessionExpired = false;
+            instance.getLTool().log(player.getName() + " succesfull register!");
+
+            players.remove(player);
+            neededRegistered.remove(player);
             return true;
         }
 
         if (command.getName().equalsIgnoreCase("login")) {
+            
+            if (!instance.getAccountManager().isSame(player.getName(), players))
+                return false;
+            
+            instance.getLTool().log(player.getName() + " trying login!");
+
+            if (!instance.getAccountManager().isRegistered(player.getName())) {
+                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
+                return false;
+            }
+
             if (args.length < 1) {
                 sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getLoginUsage());
                 return false;
             }
-            if (!isRegistered) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
-                return false;
-            }
-            if (isSessionExpired) {
-    
-                if (tryCount == 5) {
-                    player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getAttempsError());
-                    tryCount = 0;
-                    return false;
-                }
-    
+
+            if (instance.getAccountManager().isSame(player.getName(), players)) {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getAttempsError());
+                    }
+                }, 300000);
+
                 if (instance.getSettings().getEncryptionSettings().getUseEncrypt()) {
-                    if (instance.getSettings().getEncryptionSettings().getEncryptType().equalsIgnoreCase("SHA256")) {
-                        if (!HashUtil.isSame(HashUtil.hashSHA256(args[0]), playerPassword)) {
-                            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
-                            tryCount = tryCount + 1;
-                            return false;
-                        }
-                    }
-                    if (instance.getSettings().getEncryptionSettings().getEncryptType().equalsIgnoreCase("MD5")) {
-                        if (!HashUtil.isSame(HashUtil.hashMD5(args[0]), playerPassword)) {
-                            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
-                            tryCount = tryCount + 1;
-                            return false;
-                        }
-                    }
-                } else {
-                    if (!HashUtil.isSame(args[0], playerPassword)) {
+                    if (instance.getHashManager().hash(args[0]).equals(instance.getAccountManager().getPassword(player.getName()))) {
+                        timer.cancel();
+                    } else {
                         sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
-                        tryCount = tryCount + 1;
-                        return false;
                     }
                 }
             }
+
             sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getEntryMessage());
-            isRegistered = true;
-            isSessionExpired = false;
+
+            neededRegistered.remove(player);
+            players.remove(player);
+
+            instance.getLTool().log(player.getName() + " succesfull register!");
+
             try {
-                SetAccountUtil.addLoginInfo(new File(instance.getDataFolder(), "/userdata.json"), player.getName(), player.getAddress().getHostString(), DateUtil.getDate());
+                instance.getAccountManager().addLoginInfo(new File(instance.getDataFolder(), "/userdata.json"), player.getName(), player.getAddress().getHostString(), DateUtil.getDate());
             } catch (IOException e) {
-                e.printStackTrace();
             }
+
             return true;
         }
         return false;
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onMove(PlayerMoveEvent event) {
+        if (instance.getAccountManager().isSame(event.getPlayer().getName(), players)) {
+            event.setTo(event.getFrom());
+            event.setCancelled(true);
+            return;
+        }
+        event.setCancelled(false);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onChat(AsyncPlayerChatEvent event) {
+        if (instance.getAccountManager().isSame(event.getPlayer().getName(), players)) {
+            event.setCancelled(true);
+            return;
+        }
+        event.setCancelled(false);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onInteract(PlayerInteractEvent event) {
+        if (instance.getAccountManager().isSame(event.getPlayer().getName(), players)) {
+            event.setCancelled(true);
+            return;
+        }
+        event.setCancelled(false);
+    }
+
+
 }

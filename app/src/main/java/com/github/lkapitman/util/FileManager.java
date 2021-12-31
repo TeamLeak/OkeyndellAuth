@@ -20,7 +20,6 @@ public class FileManager {
             instance.getDataFolder().mkdir();
             extractUserData();
             extractConfig();    
-            extractLogs();
             extractMessages();
         } else {
             if (!new File(instance.getDataFolder(), "userdata.json").exists()) {
@@ -28,9 +27,6 @@ public class FileManager {
             }
             if (!new File(instance.getDataFolder(), "config.json").exists()) {
                 extractConfig();
-            }
-            if (!new File(instance.getDataFolder(), "logs.log").exists()) {
-                extractLogs();
             }
             if (!new File(instance.getDataFolder(), "messages_en.json").exists() || !new File(instance.getDataFolder(), "messages_ru.json").exists()) {
                 extractMessages();
@@ -63,18 +59,6 @@ public class FileManager {
 
     }
 
-    private void extractLogs() {
-        File file = new File(instance.getDataFolder(), "latest.log");
-        if (!file.exists()) {
-            InputStream link = getClass().getResourceAsStream("/latest.log");
-            try {
-                Files.copy(link, file.getAbsoluteFile().toPath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private void extractMessages() {
         File file = new File(instance.getDataFolder(), "messages_en.json");
         if (!file.exists()) {
@@ -96,9 +80,4 @@ public class FileManager {
         }
     }
 
-    public void deleteLogsFile(App instance) {
-        File file = new File(instance.getDataFolder(), "latest.log");
-        file.delete();
-        extractLogs();
-    }
 }

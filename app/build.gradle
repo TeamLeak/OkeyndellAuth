@@ -35,6 +35,9 @@ dependencies {
     
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
 
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+	annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
 }
 
 application {
