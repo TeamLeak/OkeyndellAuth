@@ -8,9 +8,9 @@ import com.github.lkapitman.config.Settings;
 import com.github.lkapitman.controller.PlayerController;
 import com.github.lkapitman.util.AccountManager;
 import com.github.lkapitman.util.FileManager;
-import com.github.lkapitman.util.HashManager;
-import com.github.lkapitman.util.HashType;
 import com.github.lkapitman.util.LoggerTool;
+import com.github.lkapitman.util.hash.HashManager;
+import com.github.lkapitman.util.hash.HashType;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

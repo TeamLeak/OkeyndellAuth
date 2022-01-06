@@ -1,4 +1,4 @@
-package com.github.lkapitman.util;
+package com.github.lkapitman.util.hash;
 
 import org.apache.commons.codec.digest.DigestUtils;
 

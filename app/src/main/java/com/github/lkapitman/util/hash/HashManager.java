@@ -1,4 +1,4 @@
-package com.github.lkapitman.util;
+package com.github.lkapitman.util.hash;
 
 public class HashManager {
 
