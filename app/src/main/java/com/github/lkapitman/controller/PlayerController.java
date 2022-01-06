@@ -46,14 +46,14 @@ public class PlayerController implements Listener, CommandExecutor {
         if (instance.getAccountManager().isRegistered(player.getName())) {
             if (instance.getAccountManager().isSessionExpired(player.getName(), player.getAddress().getHostString())) {
                 players.add(player);
-                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getInputPassword());
+                player.sendMessage(instance.getMessages().getInputPassword());
             } else {
-                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getEntryMessage());
+                player.sendMessage(instance.getMessages().getEntryMessage());
             }
         } else {
             neededRegistered.add(player);
             players.add(player);
-            player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
+            player.sendMessage(instance.getMessages().getLoginMessages().getNoAccount());
         }
     }
 
@@ -68,19 +68,19 @@ public class PlayerController implements Listener, CommandExecutor {
             instance.getLTool().log(player.getName() + " trying register!");
 
             if (!instance.getAccountManager().isSame(player.getName(), neededRegistered)) {
-                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getHaveAccount());
+                player.sendMessage(instance.getMessages().getRegisterMessages().getHaveAccount());
                 return false;
             }
             if (!(sender instanceof org.bukkit.entity.Player))
                 return false;
 
             if (args.length <= 1) {
-                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getRegisterUsage());
+                player.sendMessage(instance.getMessages().getRegisterMessages().getRegisterUsage());
                 return false;
             }
             
             if (!args[0].equals(args[1])) {
-                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getPasswordNoEquals());
+                player.sendMessage(instance.getMessages().getRegisterMessages().getPasswordNoEquals());
                 return false;
             }
 
@@ -93,11 +93,11 @@ public class PlayerController implements Listener, CommandExecutor {
             try {
                 instance.getAccountManager().addToAccounts(instance.getUserdataFile(), player.getName(), password, player.getAddress().getHostString(), DateUtil.getDate());
             } catch (IOException e) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getRegisterMessages().getRegisterError1() + ChatColor.RED + "" + ChatColor.ITALIC + instance.getMessages().getRegisterMessages().getRegisterError2());
+                sender.sendMessage(instance.getMessages().getRegisterMessages().getRegisterError1() + ChatColor.RED + "" + ChatColor.ITALIC + instance.getMessages().getRegisterMessages().getRegisterError2());
                 return false;
             }
             
-            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getEntryMessage());
+            sender.sendMessage(instance.getMessages().getEntryMessage());
             instance.getLTool().log(player.getName() + " succesfull register!");
 
             players.remove(player);
@@ -108,14 +108,14 @@ public class PlayerController implements Listener, CommandExecutor {
         if (command.getName().equalsIgnoreCase("login")) {
             
             if (!instance.getAccountManager().isSame(player.getName(), players)) {
-                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getNoAccount());
+                player.sendMessage(instance.getMessages().getLoginMessages().getNoAccount());
                 return false;
             }
 
             instance.getLTool().log(player.getName() + " trying login!");
 
             if (args.length < 1) {
-                sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getLoginUsage());
+                sender.sendMessage(instance.getMessages().getLoginMessages().getLoginUsage());
                 return false;
             }
 
@@ -124,7 +124,7 @@ public class PlayerController implements Listener, CommandExecutor {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getAttempsError());
+                        player.kickPlayer(instance.getMessages().getLoginMessages().getAttempsError());
                     }
                 }, 300000);
 
@@ -132,18 +132,18 @@ public class PlayerController implements Listener, CommandExecutor {
                     if (instance.getHashManager().hash(args[0]).equals(instance.getAccountManager().getPassword(player.getName()))) {
                         timer.cancel();
                     } else {
-                        sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
+                        sender.sendMessage(instance.getMessages().getLoginMessages().getPasswordNoEqual());
                     }
                 } else {
                     if (args[0].equals(instance.getAccountManager().getPassword(player.getName()))) {
                         timer.cancel();
                     } else {
-                        sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getLoginMessages().getPasswordNoEqual());
+                        sender.sendMessage(instance.getMessages().getLoginMessages().getPasswordNoEqual());
                     }
                 }
             }
 
-            sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + instance.getMessages().getEntryMessage());
+            sender.sendMessage(instance.getMessages().getEntryMessage());
 
             neededRegistered.remove(player);
             players.remove(player);

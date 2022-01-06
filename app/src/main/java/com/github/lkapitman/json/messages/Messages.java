@@ -1,6 +1,7 @@
 package com.github.lkapitman.json.messages;
 
 import com.fasterxml.jackson.annotation.*;
+import com.github.lkapitman.util.ColorUtil;
 
 public class Messages {
     private RegisterMessages registerMessages;
@@ -19,12 +20,12 @@ public class Messages {
     public void setLoginMessages(LoginMessages value) { this.loginMessages = value; }
 
     @JsonProperty("inputPassword")
-    public String getInputPassword() { return inputPassword; }
+    public String getInputPassword() { return ColorUtil.format(inputPassword); }
     @JsonProperty("inputPassword")
     public void setInputPassword(String value) { this.inputPassword = value; }
 
     @JsonProperty("entryMessage")
-    public String getEntryMessage() { return entryMessage; }
+    public String getEntryMessage() { return ColorUtil.format(entryMessage); }
     @JsonProperty("entryMessage")
     public void setEntryMessage(String value) { this.entryMessage = value; }
 }
