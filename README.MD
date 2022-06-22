@@ -12,6 +12,6 @@ If everything is there, write ./gradlew clean shadowJar, copy the assembled jar 
 Also, you can download from Releases
 ## Questions / Contact
 
-- VK: https://vk.com/waifusgonewild
-- Telegram: https://t.me/g_gebbels
-- Discord: ★𝕬𝖓𝖆𝖗𝖈𝖍𝖞★𝔊𝔅ℭ#4459
+- **VK: [TYK](https://vk.com/kex__sl_s)**
+- **Telegram: [TYK](https://t.me/okeyndell)**
+- **Discord: x715x#8894**
