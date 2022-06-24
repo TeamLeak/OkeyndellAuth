@@ -40,7 +40,7 @@ public class App extends JavaPlugin {
         try {
             settings.init();
             messages.init();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
 
         if (!settings.getPluginSettings().getEnabled())
@@ -56,12 +56,8 @@ public class App extends JavaPlugin {
         }
 
         switch (settings.getEncryptionSettings().getEncryptType().toLowerCase()) {
-            case "sha256":
-                hashManager = new HashManager(HashType.SHA256);
-                break;
-            case "md_5":
-                hashManager = new HashManager(HashType.MD_5);
-                break;
+            case "sha256" -> hashManager = new HashManager(HashType.SHA256);
+            case "md_5" -> hashManager = new HashManager(HashType.MD_5);
         }
 
         this.getCommand("login").setExecutor(new PlayerController(this));

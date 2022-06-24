@@ -34,8 +34,8 @@ public class PlayerController implements Listener, CommandExecutor {
         this.instance = instance;
     }
     
-    private static HashSet<org.bukkit.entity.Player> players = new HashSet<>();
-    private static HashSet<org.bukkit.entity.Player> neededRegistered = new HashSet<>();
+    private static final HashSet<org.bukkit.entity.Player> players = new HashSet<>();
+    private static final HashSet<org.bukkit.entity.Player> neededRegistered = new HashSet<>();
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
@@ -71,8 +71,6 @@ public class PlayerController implements Listener, CommandExecutor {
                 player.sendMessage(instance.getMessages().getRegisterMessages().getHaveAccount());
                 return false;
             }
-            if (!(sender instanceof org.bukkit.entity.Player))
-                return false;
 
             if (args.length <= 1) {
                 player.sendMessage(instance.getMessages().getRegisterMessages().getRegisterUsage());
@@ -98,7 +96,7 @@ public class PlayerController implements Listener, CommandExecutor {
             }
             
             sender.sendMessage(instance.getMessages().getEntryMessage());
-            instance.getLTool().log(player.getName() + " succesfull register!");
+            instance.getLTool().log(player.getName() + " successful register!");
 
             players.remove(player);
             neededRegistered.remove(player);
@@ -148,11 +146,11 @@ public class PlayerController implements Listener, CommandExecutor {
             neededRegistered.remove(player);
             players.remove(player);
 
-            instance.getLTool().log(player.getName() + " succesfull login!");
+            instance.getLTool().log(player.getName() + " successful login!");
 
             try {
                 instance.getAccountManager().addLoginInfo(new File(instance.getDataFolder(), "/userdata.json"), player.getName(), player.getAddress().getHostString(), DateUtil.getDate());
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
 
             return true;

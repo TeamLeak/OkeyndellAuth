@@ -24,7 +24,7 @@ public class AccountManager {
                     return true;
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
 
         return false;
@@ -41,7 +41,7 @@ public class AccountManager {
                 }
             }
     
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
         return true;
     }
@@ -62,7 +62,7 @@ public class AccountManager {
                     return player.getPassword();
                 }
             }    
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
         return null;
     }

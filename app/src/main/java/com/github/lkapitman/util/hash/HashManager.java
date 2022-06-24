@@ -9,13 +9,9 @@ public class HashManager {
     }
 
     public String hash(String s) {
-        switch (hashType) {
-            case SHA256:
-                return HashType.SHA256.hash(s);
-            case MD_5:
-                return HashType.MD_5.hash(s);
-            default:
-                return null;
-        }
+        return switch (hashType) {
+            case SHA256 -> HashType.SHA256.hash(s);
+            case MD_5 -> HashType.MD_5.hash(s);
+        };
     }
 }

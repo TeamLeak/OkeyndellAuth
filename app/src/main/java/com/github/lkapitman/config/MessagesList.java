@@ -22,10 +22,9 @@ public class MessagesList {
     public MessagesList(App instance) {
         this.instance = instance;
     }
-    private String locale;
 
     public void init() throws IOException {
-        locale = instance.getSettings().getPluginSettings().getLanguage();
+        String locale = instance.getSettings().getPluginSettings().getLanguage();
         if (locale.equalsIgnoreCase("en")) {
             Messages messages = MessagesConverter.fromJsonString(new File(instance.getDataFolder(), "/messages_en.json"));
             entryMessage = messages.getEntryMessage();

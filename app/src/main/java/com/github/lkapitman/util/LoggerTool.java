@@ -14,8 +14,7 @@ public class LoggerTool {
     
     private final App instance;
     private static Logger logger;
-    private String name;
-    private FileHandler fh;
+    private final String name;
 
     public LoggerTool(App instance, String name) {
         this.instance = instance;
@@ -25,7 +24,7 @@ public class LoggerTool {
     public void init() throws SecurityException, IOException {
         logger = Logger.getLogger(name);
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss");
-        fh = new FileHandler(new File(instance.getDataFolder(), "latest").getAbsolutePath() + " " + format.format(Calendar.getInstance().getTime()) + ".log");
+        FileHandler fh = new FileHandler(new File(instance.getDataFolder(), "latest").getAbsolutePath() + " " + format.format(Calendar.getInstance().getTime()) + ".log");
         fh.setFormatter(new SimpleFormatter());
         logger.addHandler(fh);
     }
